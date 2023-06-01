@@ -11,6 +11,7 @@ router = Router()
 
 @router.message(CommandStart())
 async def _start(message: Message):
+    print(message.from_user.username)
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/start'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
 
