@@ -21,14 +21,14 @@ async def play_game(board: chess.Board, move: str, user):
             return False, keyboards.InlineKeyboard.create_inline_keyboard(board)
     result = engine.play(board, chess.engine.Limit(time=0.1))
     board.push(result.move)
-    await _refrtopng(board, user)
+    await _refr_to_png(board, user)
 
     return keyboards.InlineKeyboard.create_inline_keyboard(board)
 
 
 
 
-async def _refrtopng(board, user):
+async def _refr_to_png(board, user):
     with open(f'../chess_board_screen/{user}.svg', 'w') as file:
         file.write(chess.svg.board(board, size=1000))
 
