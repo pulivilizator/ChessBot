@@ -43,12 +43,10 @@ async def _user_turn(clbc: CallbackQuery):
             elif result == -1:
                 await clbc.message.answer_photo(photo=photo, caption='Игра окончена!')
                 user_data[clbc.from_user.id]['in_game'] = False
-                user_data[clbc.from_user.id]['turns'] = 0
 
             else:
                 await clbc.message.answer_photo(photo=photo,
                                                 reply_markup=result)
-                user_data[clbc.from_user.id]['turns'] += 1
             turn = []
     else:
         await clbc.answer(text='Игру надо начать сначала')

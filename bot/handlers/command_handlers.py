@@ -31,6 +31,5 @@ async def _statistic(message: Message):
 @router.message(Command(commands=['cancel']))
 async def _cancel(message: Message):
     user_data[message.from_user.id]['in_game'] = False
-    user_data[message.from_user.id]['turns'] = 0
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
