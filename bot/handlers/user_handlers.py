@@ -36,17 +36,22 @@ async def _user_turn(clbc: CallbackQuery):
             result = await engine_game.play_game(board=user_data[clbc.from_user.id]['board'],
                                                  move=''.join(turn).replace('TUrNС122', ''),
                                                  user=clbc.from_user.id)
-
-            photo = FSInputFile(f'../chess_board_screen/{clbc.from_user.id}.png')
+            if user_data[clbc.from_user.id]['turns'] != 0:
+                photo = FSInputFile(f'../chess_board_screen/{clbc.from_user.id}.png')
+            else:
+                photo = FSInputFile('../chess_board_screen/start_position.png')
             if isinstance(result, tuple) and not result[0]:
                 await clbc.message.answer_photo(photo=photo, caption='Недопустимый ход!',
                                                 reply_markup=result[1])
             elif result == -1:
                 await clbc.message.answer_photo(photo=photo, caption='Игра окончена!')
                 user_data[clbc.from_user.id]['in_game'] = False
+                user_data[clbc.from_user.id]['turns'] = 0
+
             else:
                 await clbc.message.answer_photo(photo=photo,
                                                 reply_markup=result)
+                user_data[clbc.from_user.id]['turns'] += 1
             turn = []
     else:
         await clbc.answer(text='Игру надо начать сначала')

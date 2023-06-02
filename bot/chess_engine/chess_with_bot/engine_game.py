@@ -7,6 +7,7 @@ import cairosvg
 
 from interface import keyboards
 
+#engine = chess.engine.SimpleEngine.popen_uci(r"../stockfish/stockfish.exe")
 engine = chess.engine.SimpleEngine.popen_uci(r"../stockfish_linux/stockfish-ubuntu.04-x86-64")
 async def play_game(board: chess.Board, move: str, user):
     if board.is_game_over():
