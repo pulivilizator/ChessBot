@@ -3,9 +3,11 @@ import chess
 import chess.engine
 import chess.svg
 import aspose.words as aw
+import cairosvg
+
 from interface import keyboards
 
-engine = chess.engine.SimpleEngine.popen_uci(r"..\stockfish\stockfish.exe")
+engine = chess.engine.SimpleEngine.popen_uci(r"../stockfish_linux/stockfish-ubuntu.04-x86-64")
 async def play_game(board: chess.Board, move: str, user):
     if board.is_game_over():
         engine.quit()
@@ -29,23 +31,12 @@ async def _refrtopng(board, user):
     with open(f'../chess_board_screen/{user}.svg', 'w') as file:
         file.write(chess.svg.board(board, size=1000))
 
-    fileName = f"../chess_board_screen/{user}.svg"
-    doc = aw.Document()
+    svg_file_path = f"../chess_board_screen/{user}.svg"
 
-    builder = aw.DocumentBuilder(doc)
 
-    shape = builder.insert_image(fileName)
+    png_file_path = f"../chess_board_screen/{user}.png"
 
-    pageSetup = builder.page_setup
-    pageSetup.page_width = shape.width
-    pageSetup.page_height = shape.height
-    pageSetup.top_margin = 0
-    pageSetup.left_margin = 0
-    pageSetup.bottom_margin = 0
-    pageSetup.right_margin = 0
-
-    doc.save(f"../chess_board_screen/{user}.png")
-
+    cairosvg.svg2png(url=svg_file_path, write_to=png_file_path)
 if __name__ == '__main__':
     import chess
     asyncio.run(_refrtopng(chess.Board(), 123))
