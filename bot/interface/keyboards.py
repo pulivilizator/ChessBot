@@ -38,5 +38,6 @@ class InlineKeyboard:
 class DefaultKeyboard:
     @classmethod
     def create_default_keyboard(cls) -> ReplyKeyboardMarkup:
-        return ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Начать игру')]],
+        return ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_bot'])],
+                                             [KeyboardButton(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_human'])]],
                                    resize_keyboard=True, one_time_keyboard=True)
