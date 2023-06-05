@@ -14,6 +14,7 @@ from .FSM import FSMChessGame
 
 router = Router()
 
+
 @router.message(Command(commands=['play_with_bot']), StateFilter(default_state))
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_bot']), StateFilter(default_state))
 async def _start_game(message: Message, state: FSMContext):
@@ -26,10 +27,12 @@ async def _start_game(message: Message, state: FSMContext):
                                    user_data[message.from_user.id]['board']))
     await state.set_state(FSMChessGame.chess_ingame)
 
+
 @router.message(Command(commands=['play_with_bot']), ~StateFilter(default_state))
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_bot']), ~StateFilter(default_state))
 async def _start_error(message: Message):
     await message.answer(text='Вы и так в игре')
+
 
 @router.callback_query(Text(startswith='TUrNС122'), StateFilter(FSMChessGame.chess_ingame))
 async def _user_turn(clbc: CallbackQuery, state: FSMContext):
@@ -51,3 +54,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
                                             reply_markup=result)
         user_data[clbc.from_user.id]['turn'] = []
 
+
+@router.callback_query(Text(startswith='TUrNС122'), StateFilter(default_state))
+async def _user_turn(clbc: CallbackQuery):
+    await clbc.answer(text='Нужно сначала начать игру')
