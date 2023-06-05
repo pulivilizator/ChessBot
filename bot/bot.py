@@ -6,7 +6,7 @@ import logging
 
 from config.config import get_config
 from interface.menu import set_menu_button
-from handlers import offline_user_handlers, command_handlers
+from handlers import offline_user_handlers, command_handlers, online_user_handlers
 from middlewares import outer_middlewires
 
 
@@ -21,7 +21,7 @@ async def main():
     storage = MemoryStorage()
     bot = Bot(token=config.tg_bot.token_bot)
     dp = Dispatcher(storage=storage)
-    dp.include_routers(command_handlers.router, offline_user_handlers.router)
+    dp.include_routers(command_handlers.router, offline_user_handlers.router, online_user_handlers.router)
     dp.message.outer_middleware(outer_middlewires.DataMiddleware())
     dp.callback_query.outer_middleware(outer_middlewires.DataMiddleware())
     dp.startup.register(set_menu_button)
