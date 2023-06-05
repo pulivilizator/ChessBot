@@ -7,7 +7,7 @@ from aiogram.fsm.state import default_state
 from interface import keyboards
 from lexicon import lexicon
 from datas.datas import user_data
-from FSM import FSMChessGame
+from .FSM import FSMChessGame
 
 router = Router()
 

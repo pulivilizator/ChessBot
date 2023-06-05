@@ -10,7 +10,7 @@ from interface import keyboards
 from datas.datas import user_data
 from chess_engine.chess_with_bot import engine_game
 from lexicon import lexicon
-from FSM import FSMChessGame
+from .FSM import FSMChessGame
 
 router = Router()
 
