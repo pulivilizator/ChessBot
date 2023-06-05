@@ -8,7 +8,7 @@ from chess_engine.svg_to_png import svg_to_png
 engine = chess.engine.SimpleEngine.popen_uci(r"../stockfish_linux/stockfish-ubuntu.04-x86-64")
 
 
-async def play_game(board: chess.Board, move: str, user) -> int | (bool, keyboards.InlineKeyboard) | keyboards.InlineKeyboard:
+async def play_game(board: chess.Board, move: str, user) -> int | bool | keyboards.InlineKeyboard:
     if board.turn == chess.WHITE:
 
         if move in [str(m) for m in board.legal_moves]:
