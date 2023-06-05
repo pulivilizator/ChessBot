@@ -14,6 +14,8 @@ async def play_game(board: chess.Board, move: str, user):
 
         if move in [str(m) for m in board.legal_moves]:
             board.push(chess.Move.from_uci(move))
+        elif move.replace('q', '') in [str(m) for m in board.legal_moves]:
+            board.push(chess.Move.from_uci(move.replace('q', '')))
         else:
             return False, keyboards.InlineKeyboard.create_inline_keyboard(board)
     result = engine.play(board, chess.engine.Limit(time=0.1))

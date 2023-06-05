@@ -86,12 +86,17 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                                 reply_markup=result[1])
             elif result == -1:
                 await clbc.message.answer_photo(photo=photo, caption='Игра окончена!')
+                await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
+                                     caption='Игра окончена!\nДля выхода введите команду /cancel, или выберите ее в меню.',
+                                     photo=photo)
                 await state.clear()
 
             else:
                 await clbc.message.answer_photo(photo=photo,
+                                                caption='Ход противника!',
                                                 reply_markup=result)
                 await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
+                                     caption='Ваш ход!',
                                      photo=photo,
                                      reply_markup=result)
             battle_users[battle_id][clbc.from_user.id]['turn'] = []

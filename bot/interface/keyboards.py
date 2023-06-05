@@ -14,6 +14,8 @@ class InlineKeyboard:
     @classmethod
     def _chess_board_formatter(cls, board, i, j) -> InlineKeyboardButton:
         cell = f'TUrNС122{chr(j + 97)}{abs(i + 1 - 9)}'
+        if i == 0 or i == 7:
+            cell = cell + 'q'
         figure = board[i][j]
         if figure != '.':
             return InlineKeyboardButton(text=lexicon.LEXICON_FIGURES[figure],
