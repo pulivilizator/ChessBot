@@ -8,7 +8,7 @@ from chess import Board
 
 from interface import keyboards
 from datas.datas import user_data
-from chess_engine.chess_with_human import engine_game_online
+from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
 from datas.datas import battle_users
 from .FSM import FSMChessGame
