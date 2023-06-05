@@ -5,12 +5,12 @@ from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
 from chess import Board
+import os
 
 from interface import keyboards
-from datas.datas import user_data
 from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
-from datas.datas import battle_users
+from datas.datas import battle_users, user_data
 from .FSM import FSMChessGame
 
 router = Router()
@@ -35,9 +35,9 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
                         'username': message.from_user.username}})
             print(users)
             await bot.send_message(chat_id=users[i]['p1']['id'],
-                                   text=f'Противник найден\nВаш противник: {users[i]["p2"]["username"]}\nВаш цвет: Белый')
+                                   text=f'Противник найден\nВаш противник: @{users[i]["p2"]["username"]}\nВаш цвет: Белый')
             await bot.send_message(chat_id=users[i]['p2']['id'],
-                                   text=f'Противник найден\nВаш противник: {users[i]["p1"]["username"]}\nВаш цвет: Черный')
+                                   text=f'Противник найден\nВаш противник: @{users[i]["p1"]["username"]}\nВаш цвет: Черный')
             battle_users[''.join(map(str, [users[i]['p1']['id'], users[i]['p2']['id']]))] = {
                 users[i]['p1']['id']: {
                     'color': True,
@@ -77,18 +77,25 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
         print(battle_users)
         if len(battle_users[battle_id][clbc.from_user.id]['turn']) == 2:
             result = await engine_game_online.play_game(board=battle_users[battle_id]['board'],
-                                                 move=''.join(battle_users[battle_id][clbc.from_user.id]['turn']).replace('TUrNС122',
-                                                                                                            ''),
-                                                 users=battle_id)
+                                                        move=''.join(battle_users[battle_id][clbc.from_user.id]['turn'])
+                                                        .replace('TUrNС122',''),
+                                                        users=battle_id)
             photo = FSInputFile(f'../chess_board_screen/{battle_id}.png')
             if isinstance(result, tuple) and not result[0]:
                 await clbc.message.answer_photo(photo=photo, caption='Недопустимый ход!',
                                                 reply_markup=result[1])
             elif result == -1:
-                await clbc.message.answer_photo(photo=photo, caption='Игра окончена!')
+                await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
+                                                                     'Вы победили!')
                 await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
-                                     caption='Игра окончена!\nДля выхода введите команду /cancel, или выберите ее в меню.',
+                                     caption='Игра окончена!\n'
+                                             'Вы проиграли\n'
+                                             'Для выхода введите команду /cancel, или выберите ее в меню.',
                                      photo=photo)
+                user_data[clbc.from_user.id]['wins'] += 1
+                user_data[clbc.from_user.id]['count_games'] += 1
+                user_data[int(battle_id.replace(str(clbc.from_user.id), ''))]['count_games'] += 1
+                await _del_png(clbc)
                 await state.clear()
 
             else:
@@ -96,13 +103,16 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                                 caption='Ход противника!',
                                                 reply_markup=result)
                 await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
-                                     caption='Ваш ход!',
+                                     caption='Ваш ход!'
+                                             'Ваш цвет: Белый'
+                                     if not battle_users[battle_id][clbc.from_user.id]['color']
+                                     else 'Ваш цвет: Черный',
                                      photo=photo,
                                      reply_markup=result)
             battle_users[battle_id][clbc.from_user.id]['turn'] = []
 
 
-async def _get_id(clbc: CallbackQuery):
+async def _get_id(clbc: CallbackQuery) -> str | None:
     if any(str(clbc.from_user.id) in i for i in battle_users.keys()):
         for i in battle_users.keys():
             if str(clbc.from_user.id) in i:
@@ -110,10 +120,18 @@ async def _get_id(clbc: CallbackQuery):
     return None
 
 
-async def _check_turn(clbc: CallbackQuery):
+async def _check_turn(clbc: CallbackQuery) -> (None, None) | (bool, str):
     battle_id = await _get_id(clbc)
     if battle_id is None: return None, None
     if battle_id:
         return battle_users[battle_id][clbc.from_user.id]['color'] \
                == \
                battle_users[battle_id]['board'].turn, battle_id
+
+async def _del_png(clbc: CallbackQuery | Message):
+    files = os.listdir('../chess_board_screen')
+    folder_path = str(clbc.from_user.id)
+    for file in files:
+        if str(clbc.from_user.id) in file:
+            file_path = os.path.join(folder_path, file)
+            os.remove(file_path)

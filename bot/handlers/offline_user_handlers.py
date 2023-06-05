@@ -11,6 +11,7 @@ from datas.datas import user_data
 from chess_engine.chess_with_bot import engine_game
 from lexicon import lexicon
 from .FSM import FSMChessGame
+from .online_user_handlers import _del_png
 
 router = Router()
 
@@ -46,7 +47,17 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
             await clbc.message.answer_photo(photo=photo, caption='Недопустимый ход!',
                                             reply_markup=result[1])
         elif result == -1:
-            await clbc.message.answer_photo(photo=photo, caption='Игра окончена!')
+            await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'                                                       'Вы проиграли!')
+            user_data[clbc.from_user.id]['count_games'] += 1
+            await _del_png(clbc)
+            await state.clear()
+
+        elif result == -2:
+            await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
+                                                                 'Вы победили!')
+            user_data[clbc.from_user.id]['wins'] += 1
+            user_data[clbc.from_user.id]['count_games'] += 1
+            await _del_png(clbc)
             await state.clear()
 
         else:

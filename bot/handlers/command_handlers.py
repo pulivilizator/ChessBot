@@ -8,6 +8,7 @@ from interface import keyboards
 from lexicon import lexicon
 from datas.datas import user_data
 from .FSM import FSMChessGame
+from .online_user_handlers import _del_png
 
 router = Router()
 
@@ -41,4 +42,5 @@ async def _statistic(message: Message):
 async def _cancel(message: Message, state: FSMContext):
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
+    await _del_png(message)
     await state.clear()

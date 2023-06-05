@@ -1,8 +1,7 @@
-import asyncio
 import chess
 import chess.engine
 import chess.svg
-import cairosvg
+
 
 from interface import keyboards
 from chess_engine.svg_to_png import svg_to_png
@@ -18,6 +17,9 @@ async def play_game(board: chess.Board, move: str, user):
             board.push(chess.Move.from_uci(move.replace('q', '')))
         else:
             return False, keyboards.InlineKeyboard.create_inline_keyboard(board)
+        if board.is_game_over():
+            engine.quit()
+            return -2
     result = engine.play(board, chess.engine.Limit(time=0.1))
     board.push(result.move)
     await svg_to_png()(board, user)
