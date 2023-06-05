@@ -19,6 +19,12 @@ async def _start(message: Message):
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
 
 
+@router.message(CommandStart(), ~StateFilter(default_state))
+async def _start(message: Message):
+    print(message.from_user.username)
+    await message.answer(text='Вы в игре')
+
+
 @router.message(Command(commands=['help']))
 async def _help(message: Message):
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/help'])

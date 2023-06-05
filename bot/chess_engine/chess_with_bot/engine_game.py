@@ -2,7 +2,6 @@ import asyncio
 import chess
 import chess.engine
 import chess.svg
-import aspose.words as aw
 import cairosvg
 
 from interface import keyboards
