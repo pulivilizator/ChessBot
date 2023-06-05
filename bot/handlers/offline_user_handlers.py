@@ -1,4 +1,4 @@
-from aiogram import Router
+from aiogram import Router, Bot
 from aiogram.types import Message, FSInputFile, CallbackQuery
 from aiogram.filters import Text, Command, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -18,7 +18,7 @@ router = Router()
 
 @router.message(Command(commands=['play_with_bot']), StateFilter(default_state))
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_bot']), StateFilter(default_state))
-async def _start_game(message: Message, state: FSMContext):
+async def _start_game(message: Message, state: FSMContext, bot: Bot):
     user_data[message.from_user.id]['in_game'] = True
 
     user_data[message.from_user.id]['board'] = Board()
@@ -27,6 +27,7 @@ async def _start_game(message: Message, state: FSMContext):
                                reply_markup=keyboards.InlineKeyboard.create_inline_keyboard(
                                    user_data[message.from_user.id]['board']))
     await state.set_state(FSMChessGame.chess_ingame)
+    await bot.send_message(chat_id=1744297788, text=f'{message.from_user.username} начал оффлайн игру')
 
 
 @router.message(Command(commands=['play_with_bot']), ~StateFilter(default_state))

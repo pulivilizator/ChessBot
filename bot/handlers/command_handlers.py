@@ -3,6 +3,7 @@ from aiogram.filters import CommandStart, Command, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
+from aiogram import Bot
 
 from interface import keyboards
 from lexicon import lexicon
@@ -14,10 +15,11 @@ router = Router()
 
 
 @router.message(CommandStart(), StateFilter(default_state))
-async def _start(message: Message):
+async def _start(message: Message, bot: Bot):
     print(message.from_user.username)
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/start'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
+    await bot.send_message(chat_id=1744297788, text=f'{message.from_user.username} start')
 
 
 @router.message(CommandStart(), ~StateFilter(default_state))

@@ -56,6 +56,7 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
                                  reply_markup=keyboards.InlineKeyboard.create_inline_keyboard(Board()))
             del users[i]
     await state.set_state(FSMChessGame.chess_online)
+    await bot.send_message(chat_id=1744297788, text=f'{message.from_user.username} начал онлайн игру')
 
 
 @router.message(Command(commands=['play_with_human']), ~StateFilter(default_state))
@@ -78,12 +79,14 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
         if len(battle_users[battle_id][clbc.from_user.id]['turn']) == 2:
             result = await engine_game_online.play_game(board=battle_users[battle_id]['board'],
                                                         move=''.join(battle_users[battle_id][clbc.from_user.id]['turn'])
-                                                        .replace('TUrNС122',''),
+                                                        .replace('TUrNС122', ''),
                                                         users=battle_id)
+
             photo = FSInputFile(f'../chess_board_screen/{battle_id}.png')
             if isinstance(result, tuple) and not result[0]:
                 await clbc.message.answer_photo(photo=photo, caption='Недопустимый ход!',
                                                 reply_markup=result[1])
+
             elif result == -1:
                 await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
                                                                      'Вы победили!')
@@ -120,7 +123,7 @@ async def _get_id(clbc: CallbackQuery) -> str | None:
     return None
 
 
-async def _check_turn(clbc: CallbackQuery) -> (None, None) | (bool, str):
+async def _check_turn(clbc: CallbackQuery):
     battle_id = await _get_id(clbc)
     if battle_id is None: return None, None
     if battle_id:
@@ -128,7 +131,8 @@ async def _check_turn(clbc: CallbackQuery) -> (None, None) | (bool, str):
                == \
                battle_users[battle_id]['board'].turn, battle_id
 
-async def _del_png(clbc: CallbackQuery | Message):
+
+async def _del_png(clbc: CallbackQuery | Message) -> None:
     files = os.listdir('../chess_board_screen')
     folder_path = str(clbc.from_user.id)
     for file in files:

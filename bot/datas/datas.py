@@ -1,2 +1,2 @@
-user_data = {}
-battle_users = {}
+user_data: dict = {}
+battle_users: dict = {}
