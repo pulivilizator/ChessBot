@@ -20,7 +20,7 @@ async def play_game(board: chess.Board, move: str, user) -> int | bool | keyboar
         if board.is_game_over():
             engine.quit()
             return -2
-    result = engine.play(board, chess.engine.Limit(time=0.1))
+    result = engine.play(board, chess.engine.Limit(time=1))
     board.push(result.move)
     await svg_to_png(board, user)
     if board.is_game_over():
