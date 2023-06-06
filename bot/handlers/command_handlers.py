@@ -54,6 +54,8 @@ async def _cancel(message: Message, state: FSMContext, bot: Bot):
                                     'Для выхода нажмите на кнопку.',
                                reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
         del battle_users[battle_id]
-    print(users)
+    for i in range(len(users)):
+        if message.from_user.id == users[i]['p1']['id']:
+            del users[i]
     await _del_png(message)
     await state.clear()
