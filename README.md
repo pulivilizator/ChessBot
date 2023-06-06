@@ -1,6 +1,6 @@
 # ChessBot
 
-![text](:https://cdn.jsdelivr.net/gh/Readme-Workflows/Readme-Icons@main/icons/octicons/ApprovedChanges.svg)
+![Discourse topics](https://img.shields.io/discourse/topics?server=aqwe&style=plastic)
 
 Тестировался на убунту
 
