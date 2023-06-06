@@ -35,7 +35,6 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
                     'p2': {
                         'id': message.from_user.id,
                         'username': message.from_user.username}})
-            print(users)
             await bot.send_message(chat_id=users[i]['p1']['id'],
                                    text=f'Противник найден\nВаш противник: @{users[i]["p2"]["username"]}\nВаш цвет: Белый')
             await bot.send_message(chat_id=users[i]['p2']['id'],
