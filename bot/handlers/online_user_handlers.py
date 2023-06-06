@@ -59,7 +59,7 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
                                  reply_markup=keyboards.InlineKeyboard.create_inline_keyboard(Board()))
             del users[i]
     await state.set_state(FSMChessGame.chess_online)
-    await bot.send_message(chat_id=1744297788, text=f'{message.from_user.username} начал онлайн игру')
+    await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username} начал онлайн игру')
 
 
 @router.message(Command(commands=['play_with_human']), ~StateFilter(default_state))

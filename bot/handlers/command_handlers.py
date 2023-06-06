@@ -19,7 +19,7 @@ async def _start(message: Message, bot: Bot):
     print(message.from_user.username)
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/start'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
-    await bot.send_message(chat_id=1744297788, text=f'{message.from_user.username} start')
+    await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username} start')
 
 
 @router.message(CommandStart(), ~StateFilter(default_state))
@@ -45,11 +45,14 @@ async def _statistic(message: Message):
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/rival_stat']), StateFilter(FSMChessGame.chess_online))
 async def _rival_stat(message: Message):
     battle_id = await _get_id(message)
-    rival_id = battle_id.replace(str(message.from_user.id), '')
-    await message.answer(text=f'Статистика соперника: {user_data[rival_id]["username"]}'
-                              f'Всего игр: {user_data[rival_id]["count_games"]}\n'
-                              f'Побед: {user_data[rival_id]["wins"]}\n'
-                              f'Покинуто игр: {user_data[rival_id]["leave"]}')
+    if battle_id:
+        rival_id = int(battle_id.replace(str(message.from_user.id), ''))
+        await message.answer(text=f'Статистика соперника: @{user_data[rival_id]["username"]}\n'
+                                  f'Всего игр: {user_data[rival_id]["count_games"]}\n'
+                                  f'Побед: {user_data[rival_id]["wins"]}\n'
+                                  f'Покинуто игр: {user_data[rival_id]["leave"]}')
+    elif battle_id is None:
+        await message.answer(text='Соперник еще не найден')
 
 
 @router.message(Command(commands=['rival_stat']), ~StateFilter(FSMChessGame.chess_online))
