@@ -12,6 +12,7 @@ from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
 from datas.datas import battle_users, user_data
 from .FSM import FSMChessGame
+from chess_engine.svg_to_png import svg_to_png
 
 router = Router()
 users = []
@@ -20,7 +21,8 @@ users = []
 @router.message(Command(commands='play_with_human'), StateFilter(default_state))
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_human']), StateFilter(default_state))
 async def _start_game(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text='Идет поиск противника, ожидайте')
+    await message.answer(text='Идет поиск противника, ожидайте',
+                         reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
     if len(users) == 0:
         users.append({
             'p1': {
@@ -38,7 +40,9 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
                                    text=f'Противник найден\nВаш противник: @{users[i]["p2"]["username"]}\nВаш цвет: Белый')
             await bot.send_message(chat_id=users[i]['p2']['id'],
                                    text=f'Противник найден\nВаш противник: @{users[i]["p1"]["username"]}\nВаш цвет: Черный')
-            battle_users[''.join(map(str, [users[i]['p1']['id'], users[i]['p2']['id']]))] = {
+            battle_id = ''.join(map(str, [users[i]['p1']['id'], users[i]['p2']['id']]))
+            await svg_to_png(Board(), battle_id)
+            battle_users[battle_id] = {
                 users[i]['p1']['id']: {
                     'color': True,
                     'turn': []
@@ -88,13 +92,15 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                                 reply_markup=result[1])
 
             elif result == -1:
+                del battle_users[battle_id]
                 await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
                                                                      'Вы победили!')
                 await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
                                      caption='Игра окончена!\n'
                                              'Вы проиграли\n'
-                                             'Для выхода введите команду /cancel, или выберите ее в меню.',
-                                     photo=photo)
+                                             'Для выхода из игры нажмите кнопку.',
+                                     photo=photo,
+                                     reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
                 user_data[clbc.from_user.id]['wins'] += 1
                 user_data[clbc.from_user.id]['count_games'] += 1
                 user_data[int(battle_id.replace(str(clbc.from_user.id), ''))]['count_games'] += 1
@@ -115,7 +121,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
             battle_users[battle_id][clbc.from_user.id]['turn'] = []
 
 
-async def _get_id(clbc: CallbackQuery) -> str | None:
+async def _get_id(clbc: CallbackQuery | Message) -> str | None:
     if any(str(clbc.from_user.id) in i for i in battle_users.keys()):
         for i in battle_users.keys():
             if str(clbc.from_user.id) in i:

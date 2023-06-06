@@ -12,6 +12,7 @@ from chess_engine.chess_with_bot import engine_game
 from lexicon import lexicon
 from .FSM import FSMChessGame
 from .online_user_handlers import _del_png
+from chess_engine.svg_to_png import svg_to_png
 
 router = Router()
 
@@ -22,6 +23,7 @@ async def _start_game(message: Message, state: FSMContext, bot: Bot):
     user_data[message.from_user.id]['in_game'] = True
 
     user_data[message.from_user.id]['board'] = Board()
+    await svg_to_png(Board(), message.from_user.id)
     photo = FSInputFile('../chess_board_screen/start_position.png')
     await message.answer_photo(photo=photo,
                                reply_markup=keyboards.InlineKeyboard.create_inline_keyboard(

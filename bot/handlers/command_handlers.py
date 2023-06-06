@@ -1,5 +1,5 @@
 from aiogram import Router
-from aiogram.filters import CommandStart, Command, StateFilter
+from aiogram.filters import CommandStart, Command, StateFilter, Text
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -7,9 +7,9 @@ from aiogram import Bot
 
 from interface import keyboards
 from lexicon import lexicon
-from datas.datas import user_data
+from datas.datas import user_data, battle_users
 from .FSM import FSMChessGame
-from .online_user_handlers import _del_png, users
+from .online_user_handlers import _del_png, users, _get_id
 
 router = Router()
 
@@ -39,14 +39,21 @@ async def _statistic(message: Message):
                               f'Всего игр: {user_data[message.from_user.id]["count_games"]}\n'
                               f'Побед: {user_data[message.from_user.id]["wins"]}')
 
+
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), StateFilter(FSMChessGame.chess_online))
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), StateFilter(FSMChessGame.chess_ingame))
 @router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_online))
 @router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_ingame))
-async def _cancel(message: Message, state: FSMContext):
+async def _cancel(message: Message, state: FSMContext, bot: Bot):
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
-    if users:
-        for i in users:
-            if users[i]['id'] == message.from_user.id:
-                del users[i]
+    battle_id = await _get_id(message)
+    if battle_id:
+        await bot.send_message(chat_id=battle_id.replace(str(message.from_user.id), ''),
+                               text='Соперник завершил игру.\n'
+                                    'Для выхода нажмите на кнопку.',
+                               reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
+        del battle_users[battle_id]
+    print(users)
     await _del_png(message)
     await state.clear()
