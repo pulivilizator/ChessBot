@@ -39,7 +39,7 @@ async def _statistic(message: Message):
                               f'Всего игр: {user_data[message.from_user.id]["count_games"]}\n'
                               f'Побед: {user_data[message.from_user.id]["wins"]}')
 
-
+@router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_online))
 @router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_ingame))
 async def _cancel(message: Message, state: FSMContext):
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
