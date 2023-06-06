@@ -37,7 +37,25 @@ async def _help(message: Message):
 async def _statistic(message: Message):
     await message.answer(text=f'{lexicon.LEXICON_HANDLER_COMMANDS["/statistic"]}'
                               f'Всего игр: {user_data[message.from_user.id]["count_games"]}\n'
-                              f'Побед: {user_data[message.from_user.id]["wins"]}')
+                              f'Побед: {user_data[message.from_user.id]["wins"]}\n'
+                              f'Покинуто игр: {user_data[message.from_user.id]["leave"]}')
+
+
+@router.message(Command(commands=['rival_stat']), StateFilter(FSMChessGame.chess_online))
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/rival_stat']), StateFilter(FSMChessGame.chess_online))
+async def _rival_stat(message: Message):
+    battle_id = await _get_id(message)
+    rival_id = battle_id.replace(str(message.from_user.id), '')
+    await message.answer(text=f'Статистика соперника: {user_data[rival_id]["username"]}'
+                              f'Всего игр: {user_data[rival_id]["count_games"]}\n'
+                              f'Побед: {user_data[rival_id]["wins"]}\n'
+                              f'Покинуто игр: {user_data[rival_id]["leave"]}')
+
+
+@router.message(Command(commands=['rival_stat']), ~StateFilter(FSMChessGame.chess_online))
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/rival_stat']), ~StateFilter(FSMChessGame.chess_online))
+async def _rival_stat(message: Message):
+    await message.answer(text='Сначала найдите соперника.')
 
 
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), StateFilter(FSMChessGame.chess_online))
@@ -53,6 +71,7 @@ async def _cancel(message: Message, state: FSMContext, bot: Bot):
                                text='Соперник завершил игру.\n'
                                     'Для выхода нажмите на кнопку.',
                                reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
+        user_data[message.from_user.id]['leave'] += 1
         del battle_users[battle_id]
     for i in range(len(users)):
         if message.from_user.id == users[i]['p1']['id']:

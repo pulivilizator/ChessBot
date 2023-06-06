@@ -4,6 +4,7 @@ LEXICON_COMMANDS_MENU = {
     '/play_with_bot': 'Начать игру с ботом',
     '/play_with_human': 'Найти противника для игры',
     '/statistic': 'Показать статистику',
+    '/rival_stat': 'Показать статистику соперника',
     '/cancel': 'Выход в меню',
 }
 

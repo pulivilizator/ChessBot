@@ -10,16 +10,20 @@ from chess import Board
 class DataMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: Message | CallbackQuery, data):
         if isinstance(event, Message) and event.from_user.id not in user_data:
-            user_data[event.from_user.id] = {'turn': [],
+            user_data[event.from_user.id] = {'username': event.from_user.username,
+                                             'turn': [],
                                              'board': Board(),
                                              'wins': 0,
-                                             'count_games': 0}
+                                             'count_games': 0,
+                                             'leave': 0}
             await svg_to_png(Board(), event.from_user.id)
         elif isinstance(event, CallbackQuery) and event.from_user.id not in user_data:
-            user_data[event.from_user.id] = {'turn': [],
+            user_data[event.from_user.id] = {'username': event.from_user.username,
+                                             'turn': [],
                                              'board': Board(),
                                              'wins': 0,
-                                             'count_games': 0}
+                                             'count_games': 0,
+                                             'leave': 0}
             await svg_to_png(Board(), event.from_user.id)
         return await handler(event, data)
 

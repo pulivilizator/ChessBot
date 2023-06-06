@@ -22,7 +22,7 @@ users = []
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_human']), StateFilter(default_state))
 async def _start_game(message: Message, bot: Bot, state: FSMContext):
     await message.answer(text='Идет поиск противника, ожидайте',
-                         reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
+                         reply_markup=keyboards.DefaultKeyboard.game_stat_keyboard())
     if len(users) == 0:
         users.append({
             'p1': {

@@ -47,3 +47,9 @@ class DefaultKeyboard:
     def leave_keyboard(cls) -> ReplyKeyboardMarkup:
         return ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text=lexicon.LEXICON_COMMANDS_MENU['/cancel'])]],
                                    resize_keyboard=True, one_time_keyboard=True)
+
+    @classmethod
+    def game_stat_keyboard(cls):
+        return ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text=lexicon.LEXICON_COMMANDS_MENU['/cancel'])],
+                                             [KeyboardButton(text=lexicon.LEXICON_COMMANDS_MENU['/rival_stat'])]],
+                                   resize_keyboard=True, one_time_keyboard=True)
