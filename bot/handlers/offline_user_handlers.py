@@ -20,6 +20,8 @@ router = Router()
 @router.message(Command(commands=['play_with_bot']), StateFilter(default_state))
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/play_with_bot']), StateFilter(default_state))
 async def _start_game(message: Message, state: FSMContext, bot: Bot):
+    await message.answer(text='Начинаю игру',
+                         reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
     user_data[message.from_user.id]['in_game'] = True
 
     user_data[message.from_user.id]['board'] = Board()

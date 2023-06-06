@@ -81,3 +81,12 @@ async def _cancel(message: Message, state: FSMContext, bot: Bot):
             del users[i]
     await _del_png(message)
     await state.clear()
+
+
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), ~StateFilter(FSMChessGame.chess_online))
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), ~StateFilter(FSMChessGame.chess_ingame))
+@router.message(Command(commands=['cancel']), ~StateFilter(FSMChessGame.chess_online))
+@router.message(Command(commands=['cancel']), ~StateFilter(FSMChessGame.chess_ingame))
+async def _cancel(message: Message, state: FSMContext, bot: Bot):
+    await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
+                         reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
