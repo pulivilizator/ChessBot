@@ -111,10 +111,11 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                                 caption='Ход противника!',
                                                 reply_markup=result)
                 await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
-                                     caption='Ваш ход!'
+                                     caption='Ваш ход!\n'
                                              'Ваш цвет: Белый'
                                      if not battle_users[battle_id][clbc.from_user.id]['color']
-                                     else 'Ваш цвет: Черный',
+                                     else 'Ваш ход!\n'
+                                          'Ваш цвет: Черный',
                                      photo=photo,
                                      reply_markup=result)
             battle_users[battle_id][clbc.from_user.id]['turn'] = []
