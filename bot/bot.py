@@ -27,7 +27,10 @@ async def main():
     dp.startup.register(set_menu_button)
 
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    except Exception as ex:
+        print('ERROR', ex)
 
 
 if __name__ == '__main__':
