@@ -48,7 +48,8 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
             await clbc.message.answer_photo(photo=photo, caption='Недопустимый ход!',
                                             reply_markup=result[1])
         elif result == -1:
-            await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'                                                       'Вы проиграли!')
+            await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
+                                                                 'Вы проиграли!')
             user_data[clbc.from_user.id]['count_games'] += 1
             await _del_png(clbc)
             await state.clear()

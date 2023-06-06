@@ -133,8 +133,8 @@ async def _check_turn(clbc: CallbackQuery):
 
 
 async def _del_png(clbc: CallbackQuery | Message) -> None:
-    files = os.listdir('../chess_board_screen')
-    folder_path = str(clbc.from_user.id)
+    folder_path = '../chess_board_screen'
+    files = os.listdir(folder_path)
     for file in files:
         if str(clbc.from_user.id) in file:
             file_path = os.path.join(folder_path, file)
