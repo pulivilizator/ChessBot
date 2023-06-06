@@ -1,6 +1,6 @@
 # ChessBot
 
-![Discourse topics](https://img.shields.io/badge/telegram-%40pvp__chessbot-blue)
+[![Discourse topics](https://img.shields.io/badge/telegram-%40pvp__chessbot-blue)](https://t.me/pvp_chessbot)
 
 Тестировался на убунту
 
