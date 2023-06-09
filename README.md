@@ -9,9 +9,18 @@
 ### Используемые технологии:
 - Python 3.11;
 - aiogram 3;
-- Redis (хранилище для машины состояний);
+- Redis (хранилище для машины состояний)(В разработке);
+- PostgresSQL(Для хранений данных пользователей)(В разработке)
 ---
+### Установка и настройка:
 
-чтоб на винде запустить надо изменить путь к движку шахматному виндовому, и хз будет ли картинка генериться
-[stockfish](https://stockfishchess.org/download/)
-для работы, в вирт окружении не забыть ставить sudo apt install libcairo2 libcairo2-dev
+Бот тестировался на Ubuntu 22.04.
+
+- Для игры с ботом скачайте шахматный движок под Вашу систему, бот использовался с [Stockfish](https://stockfishchess.org/download/).
+- Клонируйте проект: `git clone https://github.com/pulivilizator/ChessBot.git`
+- Создайте и активируйте виртуальное окружение: `python3 -m venv venv` `source venv/bin/activate`
+- Установите pip и зависимости `sudo apt install pip` `pip install -r requirements.txt`
+- Установите доп. пакеты `sudo apt install libcairo2 libcairo2-dev`
+- Переименуйте .env.example в .env, и укажите токен своего бота
+- Укажите путь к движку в файле */bot/chess_engine/chess_with_bot/engine_game.py*
+- Перейдите в папку с ботом, и запустите его: `cd bot` `python3 bot.py`
