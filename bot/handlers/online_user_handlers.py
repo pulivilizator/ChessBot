@@ -108,8 +108,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
 
             else:
                 await clbc.message.answer_photo(photo=photo,
-                                                caption='Ход противника!',
-                                                reply_markup=result)
+                                                caption='Ход противника!')
                 await bot.send_photo(chat_id=battle_id.replace(str(clbc.from_user.id), ''),
                                      caption='Ваш ход!\n'
                                              'Ваш цвет: Белый'
