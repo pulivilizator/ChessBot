@@ -20,12 +20,7 @@ class RedisBattleStorage:
     def __init__(self):
         self.redis = aioredis.Redis(db=1)
 
-    async def initialize(self):
-        if not await self.redis.exists('battle_games'):
-            await self.redis.sadd('battle_games', '0')
-            await self.redis.srem('battle_games', '0')
-
-
+class OnlineStorage(RedisBattleStorage):
     @property
     async def battle_games(self):
         battle_games = await self.redis.smembers('battle_games')
@@ -58,7 +53,32 @@ class RedisBattleStorage:
         for game in games:
             await self.redis.sadd('battle_games', pickle.dumps(game))
 
+class OfflineStorage(RedisBattleStorage):
 
-storage = RedisBattleStorage()
-async def init():
-    await storage.initialize()
+    @property
+    async def battle_games_offline(self):
+        battle_games = await self.redis.smembers('battle_games_offline')
+
+        return map(lambda x: pickle.loads(x) if x != b'0' else x, battle_games)
+
+
+    async def add_off(self, data):
+        await self.redis.sadd('battle_games_offline', pickle.dumps(data))
+
+    async def set_key(self, key, value):
+        await self.redis.rpush(key, value)
+
+    async def get_key(self, key):
+        return await self.redis.lrange(key, 0, -1)
+
+    async def del_key(self, key):
+        await self.redis.delete(key)
+
+    async def overwriting_off(self, games):
+        await self.redis.delete('battle_games_offline')
+        for game in games:
+            await self.redis.sadd('battle_games_offline', pickle.dumps(game))
+
+
+storage = OnlineStorage()
+offline_storage = OfflineStorage()

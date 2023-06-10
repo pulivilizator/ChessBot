@@ -14,7 +14,7 @@ from lexicon import lexicon
 from .FSM import FSMChessGame
 from utils.utils import _del_png
 from chess_engine.svg_to_png import svg_to_png
-from datas.redis_storage import storage
+from ..datas.redis_storage import storage
 from utils.utils import _del_game_offline
 
 router = Router()
@@ -56,7 +56,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
     turns = await storage.get_key(str(clbc.from_user.id))
     turns = list(map(lambda x: x.decode('utf-8'), turns))
     game_data['turn'] = turns
-    if len(user_data[clbc.from_user.id]['turn']) == 2:
+    if len(game_data['turn']) == 2:
         result = await engine_game.play_game(board=game_data['board'],
                                              move=''.join(game_data['turn']).replace('TUrNС122', ''),
                                              user=clbc.from_user.id)
@@ -80,7 +80,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
             await state.clear()
 
         else:
-            if not game_data['turns_counter'] % 3:
+            if game_data['turns_counter'] % 3:
                 await _del_game_offline(game_data['id'])
                 game_data['turns_counter'] = 0
                 game_data['date'] = datetime.now()

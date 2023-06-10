@@ -9,8 +9,8 @@ from interface import keyboards
 from lexicon import lexicon
 from datas.datas import user_data, battle_users
 from .FSM import FSMChessGame
-from .online_user_handlers import users, _get_game, _del_game
-from utils.utils import _del_png
+from .online_user_handlers import users, _get_game
+from utils.utils import _del_png, _del_game, _del_game_offline
 
 router = Router()
 
@@ -63,9 +63,7 @@ async def _rival_stat(message: Message):
 
 
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), StateFilter(FSMChessGame.chess_online))
-@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), StateFilter(FSMChessGame.chess_ingame))
 @router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_online))
-@router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_ingame))
 async def _cancel(message: Message, state: FSMContext, bot: Bot):
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
@@ -82,6 +80,17 @@ async def _cancel(message: Message, state: FSMContext, bot: Bot):
             del users[i]
     await _del_png(message)
     await state.clear()
+
+
+@router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), StateFilter(FSMChessGame.chess_ingame))
+@router.message(Command(commands=['cancel']), StateFilter(FSMChessGame.chess_ingame))
+async def _cancel(message: Message, state: FSMContext):
+    await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
+                         reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
+    await _del_game_offline(message.from_user.id)
+    await _del_png(message)
+    await state.clear()
+
 
 
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/cancel']), ~StateFilter(FSMChessGame.chess_online))
