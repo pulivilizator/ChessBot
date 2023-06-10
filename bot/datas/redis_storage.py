@@ -32,8 +32,17 @@ class RedisBattleStorage:
 
         return map(lambda x: pickle.loads(x) if x != b'0' else x, battle_games)
 
+    @property
+    async def battle_games_offline(self):
+        battle_games = await self.redis.smembers('battle_games_offline')
+
+        return map(lambda x: pickle.loads(x) if x != b'0' else x, battle_games)
+
     async def add(self, data):
         await self.redis.sadd('battle_games', pickle.dumps(data))
+
+    async def add_off(self, data):
+        await self.redis.sadd('battle_games_offline', pickle.dumps(data))
 
     async def set_key(self, key, value):
         await self.redis.rpush(key, value)

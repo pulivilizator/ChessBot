@@ -17,11 +17,17 @@ async def _del_png(clbc: CallbackQuery | Message) -> None:
 async def _del_game(battle_id):
     await storage.overwriting([i for i in await storage.battle_games if i['battle_id'] != battle_id])
 
+async def _del_game_offline(battle_id):
+    await storage.overwriting([i for i in await storage.battle_games_offline if i['id'] != battle_id])
+
 
 async def cleaner():
     for i in await storage.battle_games:
         if datetime.now() - i['date'] > timedelta(hours=24):
             await _del_game(i['battle_id'])
+    for i in await storage.battle_games_offline:
+        if datetime.now() - i['date'] > timedelta(hours=24):
+            await _del_game_offline(i['id'])
 
 async def start_clean():
     scheduler = AsyncIOScheduler()

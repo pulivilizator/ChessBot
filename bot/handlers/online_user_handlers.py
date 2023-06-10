@@ -5,7 +5,7 @@ from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
 from chess import Board
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 
 from interface import keyboards
@@ -67,6 +67,7 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
             del users[i]
     await state.set_state(FSMChessGame.chess_online)
     await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username} начал онлайн игру')
+    await bot.send_message(chat_id=464437438, text=f'@{message.from_user.username} ожидает соперника')
 
 
 @router.message(Command(commands=['play_with_human']), ~StateFilter(default_state))
@@ -134,9 +135,10 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                           'Ваш цвет: Черный',
                                      photo=photo,
                                      reply_markup=result)
+                battle_game['turns_counter'] += 1
             await storage.del_key(str(clbc.from_user.id))
+            await storage.del_key(battle_id.replace(str(clbc.from_user.id), ''))
             battle_game[clbc.from_user.id]['turn'] = []
-            battle_game['turns_counter'] += 1
 
 
 async def _get_game(clbc: CallbackQuery | Message) -> dict | None:
