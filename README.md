@@ -9,7 +9,7 @@
 ### Используемые технологии:
 - Python 3.11;
 - aiogram 3;
-- Redis (хранилище для машины состояний)(В разработке);
+- Redis (Хранилище текущих игровых данных);
 - PostgresSQL(Для хранений данных пользователей)(В разработке)
 ---
 ### Установка и настройка:
@@ -17,6 +17,7 @@
 Бот тестировался на Ubuntu 22.04.
 
 - Для игры с ботом скачайте шахматный движок под Вашу систему, бот использовался с [Stockfish](https://stockfishchess.org/download/).
+- Установите Redis следуя [инструкциям](https://redis.io/docs/getting-started/)
 - Клонируйте проект: `git clone https://github.com/pulivilizator/ChessBot.git`
 - Создайте и активируйте виртуальное окружение: `python3 -m venv venv` `source venv/bin/activate`
 - Установите pip и зависимости `sudo apt install pip` `pip install -r requirements.txt`
