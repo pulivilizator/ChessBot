@@ -9,7 +9,7 @@ from interface import keyboards
 from lexicon import lexicon
 from datas.datas import user_data, battle_users
 from .FSM import FSMChessGame
-from .online_user_handlers import _del_png, users, _get_id
+from .online_user_handlers import _del_png, users, _get_game, _del_game
 
 router = Router()
 
@@ -44,14 +44,14 @@ async def _statistic(message: Message):
 @router.message(Command(commands=['rival_stat']), StateFilter(FSMChessGame.chess_online))
 @router.message(Text(text=lexicon.LEXICON_COMMANDS_MENU['/rival_stat']), StateFilter(FSMChessGame.chess_online))
 async def _rival_stat(message: Message):
-    battle_id = await _get_id(message)
-    if battle_id:
-        rival_id = int(battle_id.replace(str(message.from_user.id), ''))
+    battle_game = await _get_game(message)
+    if battle_game:
+        rival_id = int(battle_game['battle_id'].replace(str(message.from_user.id), ''))
         await message.answer(text=f'Статистика соперника: @{user_data[rival_id]["username"]}\n'
                                   f'Всего игр: {user_data[rival_id]["count_games"]}\n'
                                   f'Побед: {user_data[rival_id]["wins"]}\n'
                                   f'Покинуто игр: {user_data[rival_id]["leave"]}')
-    elif battle_id is None:
+    elif battle_game is None:
         await message.answer(text='Соперник еще не найден')
 
 
@@ -68,14 +68,14 @@ async def _rival_stat(message: Message):
 async def _cancel(message: Message, state: FSMContext, bot: Bot):
     await message.answer(text=lexicon.LEXICON_HANDLER_COMMANDS['/cancel'],
                          reply_markup=keyboards.DefaultKeyboard.create_default_keyboard())
-    battle_id = await _get_id(message)
-    if battle_id:
-        await bot.send_message(chat_id=battle_id.replace(str(message.from_user.id), ''),
+    battle_game = await _get_game(message)
+    if battle_game:
+        await bot.send_message(chat_id=battle_game['battle_id'].replace(str(message.from_user.id), ''),
                                text='Соперник завершил игру.\n'
                                     'Для выхода нажмите на кнопку.',
                                reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
         user_data[message.from_user.id]['leave'] += 1
-        del battle_users[battle_id]
+        await _del_game(battle_game['battle_id'])
     for i in range(len(users)):
         if message.from_user.id == users[i]['p1']['id']:
             del users[i]

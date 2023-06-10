@@ -11,15 +11,17 @@ async def memory_storage() -> RedisStorage:
 class RedisBattleStorage:
     __instance = None
     def __new__(cls, *args, **kwargs):
-        if cls.__instance in None:
+        if cls.__instance is None:
             cls.__instance = object.__new__(cls)
         return cls.__instance
 
     def __init__(self):
-        self.redis = redis = aioredis.Redis(db=1)
-        if not await redis.exists('battle_games'):
-            await redis.sadd('battle_games', '0')
-            await redis.srem('battle_games', '0')
+        self.redis = aioredis.Redis(db=1)
+
+    async def initialize(self):
+        if not await self.redis.exists('battle_games'):
+            await self.redis.sadd('battle_games', '0')
+            await self.redis.srem('battle_games', '0')
 
 
     @property
@@ -31,3 +33,11 @@ class RedisBattleStorage:
     async def add(self, data):
         await self.redis.sadd('battle_games', pickle.dumps(data))
 
+    async def overwriting(self, games):
+        await self.redis.delete('battle_games')
+        for game in games:
+            await self.redis.sadd('battle_games', pickle.dumps(game))
+
+
+storage = RedisBattleStorage()
+storage.initialize()
