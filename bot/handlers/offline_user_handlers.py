@@ -14,7 +14,7 @@ from lexicon import lexicon
 from .FSM import FSMChessGame
 from utils.utils import _del_png
 from chess_engine.svg_to_png import svg_to_png
-from ..datas.redis_storage import storage
+from datas.redis_storage import offline_storage
 from utils.utils import _del_game_offline
 
 router = Router()
@@ -25,7 +25,7 @@ router = Router()
 async def _start_game(message: Message, state: FSMContext, bot: Bot):
     await message.answer(text='Начинаю игру',
                          reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
-    await storage.add_off(
+    await offline_storage.add_off(
         {
             'board': Board(),
             'turn': [],
@@ -34,7 +34,7 @@ async def _start_game(message: Message, state: FSMContext, bot: Bot):
             'turns_counter': 0
         }
     )
-    await storage.del_key(message.from_user.id)
+    await offline_storage.del_key(message.from_user.id)
     await svg_to_png(Board(), message.from_user.id)
     photo = FSInputFile('../chess_board_screen/start_position.png')
     await message.answer_photo(photo=photo,
@@ -51,9 +51,9 @@ async def _start_error(message: Message):
 
 @router.callback_query(Text(startswith='TUrNС122'), StateFilter(FSMChessGame.chess_ingame))
 async def _user_turn(clbc: CallbackQuery, state: FSMContext):
-    game_data = [i for i in await storage.battle_games_offline if i['id'] == clbc.from_user.id][0]
-    await storage.set_key(str(clbc.from_user.id), clbc.data)
-    turns = await storage.get_key(str(clbc.from_user.id))
+    game_data = [i for i in await offline_storage.battle_games_offline if i['id'] == clbc.from_user.id][0]
+    await offline_storage.set_key(str(clbc.from_user.id), clbc.data)
+    turns = await offline_storage.get_key(str(clbc.from_user.id))
     turns = list(map(lambda x: x.decode('utf-8'), turns))
     game_data['turn'] = turns
     if len(game_data['turn']) == 2:
@@ -84,12 +84,12 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
                 await _del_game_offline(game_data['id'])
                 game_data['turns_counter'] = 0
                 game_data['date'] = datetime.now()
-                await storage.add_off(game_data)
+                await offline_storage.add_off(game_data)
             await clbc.message.answer_photo(photo=photo,
                                             reply_markup=result)
             game_data['turns_counter'] += 1
         user_data[clbc.from_user.id]['turn'] = []
-        await storage.del_key(clbc.from_user.id)
+        await offline_storage.del_key(clbc.from_user.id)
 
 
 @router.callback_query(Text(startswith='TUrNС122'), StateFilter(default_state))
