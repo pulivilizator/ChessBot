@@ -5,16 +5,17 @@ from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
 from chess import Board
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 from interface import keyboards
 from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
-from datas.datas import battle_users, user_data
+from datas.datas import user_data
 from datas.redis_storage import storage
 from .FSM import FSMChessGame
 from chess_engine.svg_to_png import svg_to_png
+from utils.utils import _del_png
 
 router = Router()
 users = []
@@ -61,6 +62,8 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
             await bot.send_photo(photo=photo, chat_id=users[i]['p1']['id'],
                                  reply_markup=keyboards.InlineKeyboard.create_inline_keyboard(Board()))
             await bot.send_photo(photo=photo, chat_id=users[i]['p2']['id'])
+            await storage.del_key(users[i]['p1']['id'])
+            await storage.del_key(users[i]['p2']['id'])
             del users[i]
     await state.set_state(FSMChessGame.chess_online)
     await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username} начал онлайн игру')
@@ -81,8 +84,12 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
     elif not check_turn:
         await clbc.answer(text='Не ваш ход')
     else:
-        battle_game[clbc.from_user.id]['turn'].append(clbc.data)
-        print(battle_users)
+        await storage.set_key(str(clbc.from_user.id), clbc.data)
+        turns = await storage.get_key(str(clbc.from_user.id))
+        turns = list(map(lambda x: x.decode('utf-8'), turns))
+        battle_game[clbc.from_user.id]['turn'] = turns
+        print(battle_game)
+        print(battle_game['date'])
         if len(battle_game[clbc.from_user.id]['turn']) == 2:
             result = await engine_game_online.play_game(board=battle_game['board'],
                                                         move=''.join(battle_game[clbc.from_user.id]['turn'])
@@ -112,8 +119,10 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                 await state.clear()
 
             else:
-                if battle_game['turns_counter'] >= 3:
+                if not battle_game['turns_counter'] % 3:
                     await _del_game(battle_id)
+                    battle_game['turns_counter'] = 0
+                    battle_game['date'] = datetime.now()
                     await storage.add(battle_game)
                 await clbc.message.answer_photo(photo=photo,
                                                 caption='Ход противника!')
@@ -125,6 +134,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                           'Ваш цвет: Черный',
                                      photo=photo,
                                      reply_markup=result)
+            await storage.del_key(str(clbc.from_user.id))
             battle_game[clbc.from_user.id]['turn'] = []
             battle_game['turns_counter'] += 1
 
@@ -143,13 +153,17 @@ async def _check_turn(clbc: CallbackQuery):
            == \
            battle_game['board'].turn, battle_game
 
+
+async def _counter_turns(clbk: CallbackQuery):
+    if not await storage.get_key(str(clbk.from_user.id)):
+        await storage.set_key(str(clbk.from_user.id), clbk.data)
+    else:
+        first_turn = await storage.get_key(str(clbk.from_user.id))
+        first_turn = first_turn.decode('utf-8')
+        return [first_turn, clbk.data]
+
+
 async def _del_game(battle_id):
     await storage.overwriting([i for i in await storage.battle_games if i['battle_id'] != battle_id])
 
-async def _del_png(clbc: CallbackQuery | Message) -> None:
-    folder_path = '../chess_board_screen'
-    files = os.listdir(folder_path)
-    for file in files:
-        if str(clbc.from_user.id) in file:
-            file_path = os.path.join(folder_path, file)
-            os.remove(file_path)
+

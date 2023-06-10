@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.fsm.storage.redis import RedisStorage
 from redis import asyncio as aioredis
 import pickle
@@ -33,6 +35,15 @@ class RedisBattleStorage:
     async def add(self, data):
         await self.redis.sadd('battle_games', pickle.dumps(data))
 
+    async def set_key(self, key, value):
+        await self.redis.rpush(key, value)
+
+    async def get_key(self, key):
+        return await self.redis.lrange(key, 0, -1)
+
+    async def del_key(self, key):
+        await self.redis.delete(key)
+
     async def overwriting(self, games):
         await self.redis.delete('battle_games')
         for game in games:
@@ -40,4 +51,5 @@ class RedisBattleStorage:
 
 
 storage = RedisBattleStorage()
-storage.initialize()
+async def init():
+    await storage.initialize()

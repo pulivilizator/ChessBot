@@ -11,7 +11,7 @@ from datas.datas import user_data
 from chess_engine.chess_with_bot import engine_game
 from lexicon import lexicon
 from .FSM import FSMChessGame
-from .online_user_handlers import _del_png
+from utils.utils import _del_png
 from chess_engine.svg_to_png import svg_to_png
 
 router = Router()
