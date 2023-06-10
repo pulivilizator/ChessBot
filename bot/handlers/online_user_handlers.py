@@ -15,7 +15,7 @@ from datas.datas import user_data
 from datas.redis_storage import storage
 from .FSM import FSMChessGame
 from chess_engine.svg_to_png import svg_to_png
-from utils.utils import _del_png
+from utils.utils import _del_png, _del_game
 
 router = Router()
 users = []
@@ -163,7 +163,5 @@ async def _counter_turns(clbk: CallbackQuery):
         return [first_turn, clbk.data]
 
 
-async def _del_game(battle_id):
-    await storage.overwriting([i for i in await storage.battle_games if i['battle_id'] != battle_id])
 
 
