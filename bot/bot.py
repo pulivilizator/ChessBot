@@ -1,5 +1,4 @@
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
 
 import asyncio
 import logging
@@ -8,6 +7,7 @@ from config.config import get_config
 from interface.menu import set_menu_button
 from handlers import offline_user_handlers, command_handlers, online_user_handlers
 from middlewares import outer_middlewires
+from datas.redis_storage import memory_storage
 
 
 async def main():
@@ -18,7 +18,7 @@ async def main():
 
     logger.info('Starting bot')
     config = get_config()
-    storage = MemoryStorage()
+    storage = await memory_storage()
     bot = Bot(token=config.tg_bot.token_bot)
     dp = Dispatcher(storage=storage)
     dp.include_routers(command_handlers.router, offline_user_handlers.router, online_user_handlers.router)
@@ -27,10 +27,7 @@ async def main():
     dp.startup.register(set_menu_button)
 
     await bot.delete_webhook(drop_pending_updates=True)
-    try:
-        await dp.start_polling(bot)
-    except Exception as ex:
-        print('ERROR', ex)
+    await dp.start_polling(bot)
 
 
 if __name__ == '__main__':

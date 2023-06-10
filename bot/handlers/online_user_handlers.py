@@ -5,15 +5,18 @@ from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
 from chess import Board
+from datetime import datetime
 import os
 
 from interface import keyboards
 from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
-from datas.datas import battle_users, user_data
+from ..datas.datas import battle_users, user_data
+from ..datas.redis_storage import RedisBattleStorage
 from .FSM import FSMChessGame
 from chess_engine.svg_to_png import svg_to_png
 
+storage = RedisBattleStorage()
 router = Router()
 users = []
 
@@ -50,7 +53,8 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
                     'color': False,
                     'turn': []
                 },
-                'board': Board()
+                'board': Board(),
+                'date': datetime.now()
             }
             photo = FSInputFile('../chess_board_screen/start_position.png')
             await bot.send_photo(photo=photo, chat_id=users[i]['p1']['id'],
