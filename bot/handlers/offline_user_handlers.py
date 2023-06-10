@@ -68,6 +68,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
             await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
                                                                  'Вы проиграли!')
             user_data[clbc.from_user.id]['count_games'] += 1
+            await _del_game_offline(clbc.from_user.id)
             await _del_png(clbc)
             await state.clear()
 
@@ -76,18 +77,17 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
                                                                  'Вы победили!')
             user_data[clbc.from_user.id]['wins'] += 1
             user_data[clbc.from_user.id]['count_games'] += 1
+            await _del_game_offline(clbc.from_user.id)
             await _del_png(clbc)
             await state.clear()
 
         else:
-            if game_data['turns_counter'] % 3:
-                await _del_game_offline(game_data['id'])
-                game_data['turns_counter'] = 0
-                game_data['date'] = datetime.now()
-                await offline_storage.add_off(game_data)
+            await _del_game_offline(game_data['id'])
+            game_data['turns_counter'] = 0
+            game_data['date'] = datetime.now()
+            await offline_storage.add_off(game_data)
             await clbc.message.answer_photo(photo=photo,
                                             reply_markup=result)
-            game_data['turns_counter'] += 1
         user_data[clbc.from_user.id]['turn'] = []
         await offline_storage.del_key(clbc.from_user.id)
 
