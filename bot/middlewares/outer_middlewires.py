@@ -11,7 +11,7 @@ class DataMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: Message | CallbackQuery, data):
         if isinstance(event, Message) and event.from_user.id not in user_data:
             user_data[event.from_user.id] = {'username': event.from_user.username,
-                                             'turn': [],
+                                             'id': event.from_user.id,
                                              'board': Board(),
                                              'wins': 0,
                                              'count_games': 0,
@@ -19,7 +19,7 @@ class DataMiddleware(BaseMiddleware):
             await svg_to_png(Board(), event.from_user.id)
         elif isinstance(event, CallbackQuery) and event.from_user.id not in user_data:
             user_data[event.from_user.id] = {'username': event.from_user.username,
-                                             'turn': [],
+                                             'id': event.from_user.id,
                                              'board': Board(),
                                              'wins': 0,
                                              'count_games': 0,

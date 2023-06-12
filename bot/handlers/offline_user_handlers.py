@@ -40,7 +40,7 @@ async def _start_game(message: Message, state: FSMContext, bot: Bot):
     await message.answer_photo(photo=photo,
                                reply_markup=keyboards.InlineKeyboard.create_inline_keyboard(Board()))
     await state.set_state(FSMChessGame.chess_ingame)
-    await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username} начал оффлайн игру')
+    await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username}, {message.from_user.full_name} начал оффлайн игру')
 
 
 @router.message(Command(commands=['play_with_bot']), ~StateFilter(default_state))

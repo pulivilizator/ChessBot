@@ -6,7 +6,6 @@ from aiogram.fsm.context import FSMContext
 
 from chess import Board
 from datetime import datetime
-import os
 
 from interface import keyboards
 from chess_engine.chess_with_people import engine_game_online
@@ -66,8 +65,8 @@ async def _start_game(message: Message, bot: Bot, state: FSMContext):
             await storage.del_key(users[i]['p2']['id'])
             del users[i]
     await state.set_state(FSMChessGame.chess_online)
-    await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username} начал онлайн игру')
-    await bot.send_message(chat_id=464437438, text=f'@{message.from_user.username} ожидает соперника')
+    await bot.send_message(chat_id=1744297788, text=f'@{message.from_user.username}, {message.from_user.full_name} ожидает соперника')
+    await bot.send_message(chat_id=464437438, text=f'@{message.from_user.username}, {message.from_user.full_name} ожидает соперника')
 
 
 @router.message(Command(commands=['play_with_human']), ~StateFilter(default_state))
