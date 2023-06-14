@@ -82,7 +82,9 @@ async def _cancel(message: Message, state: FSMContext, bot: Bot):
                                text='Соперник завершил игру.\n'
                                     'Для выхода нажмите на кнопку.',
                                reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
-        user_data[message.from_user.id]['leave'] += 1
+        await client.execute(f"""UPDATE users
+                                 SET leave=leave + 1
+                                 WHERE user_id={message.from_user.id};""")
         await _del_game(battle_game['battle_id'])
     for i in range(len(users)):
         if message.from_user.id == users[i]['p1']['id']:

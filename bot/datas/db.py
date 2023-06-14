@@ -51,7 +51,7 @@ class DataBase:
             query = f"""CREATE TABLE {table_name} (
                         id SERIAL PRIMARY KEY,
                         username VARCHAR(150),
-                        user_id INT,
+                        user_id BIGSERIAL,
                         wins SMALLINT,
                         count_games SMALLINT,
                         leave SMALLINT);"""
