@@ -1,5 +1,4 @@
 import asyncpg
-import asyncio
 from config.config import get_config
 
 

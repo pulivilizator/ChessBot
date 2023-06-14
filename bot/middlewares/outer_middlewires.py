@@ -1,7 +1,6 @@
 from aiogram import BaseMiddleware
 from aiogram.types import Message, CallbackQuery
 
-from datas.datas import user_data
 from chess_engine.svg_to_png import svg_to_png
 from datas.db import client
 from datas.redis_storage import RedisBattleStorage

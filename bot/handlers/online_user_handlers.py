@@ -10,8 +10,7 @@ from datetime import datetime
 from interface import keyboards
 from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
-from ..datas.datas import user_data
-from ..datas.db import client
+from datas.db import client
 from datas.redis_storage import storage
 from .FSM import FSMChessGame
 from chess_engine.svg_to_png import svg_to_png
