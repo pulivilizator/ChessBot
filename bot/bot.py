@@ -9,6 +9,7 @@ from handlers import offline_user_handlers, command_handlers, online_user_handle
 from middlewares import outer_middlewires
 from datas.redis_storage import memory_storage
 from utils.utils import start_clean
+from datas.db import client
 
 
 async def main():
@@ -18,6 +19,7 @@ async def main():
                '[%(asctime)s] - %(name)s - %(message)s')
 
     logger.info('Starting bot')
+    await client.create_table('users')
     await start_clean()
     config = get_config()
     storage = await memory_storage()

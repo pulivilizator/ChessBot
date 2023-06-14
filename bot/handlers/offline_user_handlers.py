@@ -8,7 +8,6 @@ from chess import Board
 from datetime import datetime
 
 from interface import keyboards
-from datas.datas import user_data
 from chess_engine.chess_with_bot import engine_game
 from lexicon import lexicon
 from .FSM import FSMChessGame
@@ -16,6 +15,7 @@ from utils.utils import _del_png
 from chess_engine.svg_to_png import svg_to_png
 from datas.redis_storage import offline_storage
 from utils.utils import _del_game_offline
+from datas.db import client
 
 router = Router()
 
@@ -67,7 +67,10 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
         elif result == -1:
             await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
                                                                  'Вы проиграли!')
-            user_data[clbc.from_user.id]['count_games'] += 1
+            await client.execute(f"""UPDATE users
+                                     SET count_games=count_games + 1
+                                     WHERE user_id={clbc.from_user.id};""")
+            await client.close()
             await _del_game_offline(clbc.from_user.id)
             await _del_png(clbc)
             await state.clear()
@@ -75,8 +78,10 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
         elif result == -2:
             await clbc.message.answer_photo(photo=photo, caption='Игра окончена!\n'
                                                                  'Вы победили!')
-            user_data[clbc.from_user.id]['wins'] += 1
-            user_data[clbc.from_user.id]['count_games'] += 1
+            await client.execute(f"""UPDATE users
+                                     SET count_games = count_games + 1, wins = wins + 1
+                                     WHERE user_id={clbc.from_user.id};""")
+            await client.close()
             await _del_game_offline(clbc.from_user.id)
             await _del_png(clbc)
             await state.clear()
@@ -88,7 +93,7 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext):
             await offline_storage.add_off(game_data)
             await clbc.message.answer_photo(photo=photo,
                                             reply_markup=result)
-        user_data[clbc.from_user.id]['turn'] = []
+        game_data['turn'] = []
         await offline_storage.del_key(clbc.from_user.id)
 
 

@@ -10,7 +10,8 @@ from datetime import datetime
 from interface import keyboards
 from chess_engine.chess_with_people import engine_game_online
 from lexicon import lexicon
-from datas.datas import user_data
+from ..datas.datas import user_data
+from ..datas.db import client
 from datas.redis_storage import storage
 from .FSM import FSMChessGame
 from chess_engine.svg_to_png import svg_to_png
@@ -112,9 +113,13 @@ async def _user_turn(clbc: CallbackQuery, state: FSMContext, bot: Bot):
                                              'Для выхода из игры нажмите кнопку.',
                                      photo=photo,
                                      reply_markup=keyboards.DefaultKeyboard.leave_keyboard())
-                user_data[clbc.from_user.id]['wins'] += 1
-                user_data[clbc.from_user.id]['count_games'] += 1
-                user_data[int(battle_id.replace(str(clbc.from_user.id), ''))]['count_games'] += 1
+                await client.execute(f"""UPDATE users
+                                         SET count_games = count_games + 1, wins = wins + 1
+                                         WHERE user_id={clbc.from_user.id};""")
+                await client.execute(f"""UPDATE users
+                                         SET count_games = count_games + 1
+                                         WHERE user_id={int(battle_id.replace(str(clbc.from_user.id), ''))};""")
+                await client.close()
                 await _del_png(clbc)
                 await state.clear()
 

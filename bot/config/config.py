@@ -7,10 +7,11 @@ class TgBot:
 
 @dataclass
 class DataBase:
-    login: str = False
-    passw: str = False
-    ip: str = False
-    port: str = False
+    user: str
+    passw: str
+    host: str
+    port: int
+    db: str
 
 @dataclass
 class Config:
@@ -22,4 +23,10 @@ def get_config(path: str | None = None) -> Config:
     env = Env()
     env.read_env(path)
     return Config(tg_bot=TgBot(token_bot=env('BOT_TOKEN')),
-                  data_base=DataBase())
+                  data_base=DataBase(
+                      user=env('USER'),
+                      passw=env('PASSWORD'),
+                      host=env('HOST'),
+                      port=int(env('PORT')),
+                      db=env('DATABASE')
+                  ))
