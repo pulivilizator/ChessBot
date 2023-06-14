@@ -39,7 +39,6 @@ class OnlineStorage(RedisBattleStorage):
 
     async def del_key(self, key):
         await self.redis.delete(key)
-
     async def overwriting(self, games):
         await self.redis.delete('battle_games')
         for game in games:

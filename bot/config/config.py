@@ -24,7 +24,7 @@ def get_config(path: str | None = None) -> Config:
     env.read_env(path)
     return Config(tg_bot=TgBot(token_bot=env('BOT_TOKEN')),
                   data_base=DataBase(
-                      user=env('USER'),
+                      user=env('C_USER'),
                       passw=env('PASSWORD'),
                       host=env('HOST'),
                       port=int(env('PORT')),

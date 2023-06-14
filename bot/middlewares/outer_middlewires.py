@@ -15,7 +15,7 @@ class DataMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: Message | CallbackQuery, data):
         redis_result = await r_storage.redis.get(str(event.from_user.id))
         if not redis_result:
-            db_result = await client.execute(f"""SELECT *
+            db_result = await client.fetch(f"""SELECT *
                                                  FROM users
                                                  WHERE user_id = {event.from_user.id}""")
             if not db_result:

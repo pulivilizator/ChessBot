@@ -40,6 +40,7 @@ async def _statistic(message: Message):
     stat = await client.fetch(f"""SELECT *
                                   FROM users
                                   WHERE user_id = {message.from_user.id}""")
+    stat = stat[0]
     await message.answer(text=f'{lexicon.LEXICON_HANDLER_COMMANDS["/statistic"]}'
                               f'Всего игр: {stat["count_games"]}\n'
                               f'Побед: {stat["wins"]}\n'
@@ -55,6 +56,7 @@ async def _rival_stat(message: Message):
         stat = await client.fetch(f"""SELECT *
                                       FROM users
                                       WHERE user_id = {rival_id}""")
+        stat = stat[0]
         await message.answer(text=f'Статистика соперника: {stat["username"]}\n'
                                   f'Всего игр: {stat["count_games"]}\n'
                                   f'Побед: {stat["wins"]}\n'
