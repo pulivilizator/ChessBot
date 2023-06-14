@@ -7,7 +7,7 @@ from aiogram import Bot
 
 from interface import keyboards
 from lexicon import lexicon
-from datas.datas import user_data
+from datas.db import client
 from .FSM import FSMChessGame
 from .online_user_handlers import users, _get_game
 from utils.utils import _del_png, _del_game, _del_game_offline
@@ -37,10 +37,13 @@ async def _help(message: Message):
 
 @router.message(Command(commands=['statistic']))
 async def _statistic(message: Message):
+    stat = await client.fetch(f"""SELECT *
+                                  FROM users
+                                  WHERE user_id = {message.from_user.id}""")
     await message.answer(text=f'{lexicon.LEXICON_HANDLER_COMMANDS["/statistic"]}'
-                              f'Всего игр: {user_data[message.from_user.id]["count_games"]}\n'
-                              f'Побед: {user_data[message.from_user.id]["wins"]}\n'
-                              f'Покинуто игр: {user_data[message.from_user.id]["leave"]}')
+                              f'Всего игр: {stat["count_games"]}\n'
+                              f'Побед: {stat["wins"]}\n'
+                              f'Покинуто игр: {stat["leave"]}')
 
 
 @router.message(Command(commands=['rival_stat']), StateFilter(FSMChessGame.chess_online))
@@ -49,10 +52,13 @@ async def _rival_stat(message: Message):
     battle_game = await _get_game(message)
     if battle_game:
         rival_id = int(battle_game['battle_id'].replace(str(message.from_user.id), ''))
-        await message.answer(text=f'Статистика соперника: @{user_data[rival_id]["username"]}\n'
-                                  f'Всего игр: {user_data[rival_id]["count_games"]}\n'
-                                  f'Побед: {user_data[rival_id]["wins"]}\n'
-                                  f'Покинуто игр: {user_data[rival_id]["leave"]}')
+        stat = await client.fetch(f"""SELECT *
+                                      FROM users
+                                      WHERE user_id = {rival_id}""")
+        await message.answer(text=f'Статистика соперника: {stat["username"]}\n'
+                                  f'Всего игр: {stat["count_games"]}\n'
+                                  f'Побед: {stat["wins"]}\n'
+                                  f'Покинуто игр: {stat["leave"]}')
     elif battle_game is None:
         await message.answer(text='Соперник еще не найден')
 
