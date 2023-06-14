@@ -10,7 +10,7 @@
 - Python 3.11;
 - aiogram 3;
 - Redis (Хранилище текущих игровых данных);
-- PostgresSQL(Для хранений данных пользователей)(В разработке)
+- PostgresSQL(Для хранений данных пользователей)
 ---
 ### Установка и настройка:
 
@@ -18,6 +18,7 @@
 
 - Для игры с ботом скачайте шахматный движок под Вашу систему, бот использовался с [Stockfish](https://stockfishchess.org/download/).
 - Установите Redis следуя [инструкциям](https://redis.io/docs/getting-started/)
+- Установите и настройте [PostgreSQL](https://www.postgresql.org/)
 - Клонируйте проект: `git clone https://github.com/pulivilizator/ChessBot.git`
 - Создайте и активируйте виртуальное окружение: `python3 -m venv venv` `source venv/bin/activate`
 - Установите pip и зависимости `sudo apt install pip` `pip install -r requirements.txt`
