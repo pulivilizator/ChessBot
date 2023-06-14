@@ -4,7 +4,7 @@
 
 ### Бот позволяющий играть в шахматы с людьми, либо с шахматным движком по стандартным правилам при помощи инлайн клавиатуры.
 
-![image](https://github.com/pulivilizator/ChessBot/assets/112427972/50d680a8-efd9-4ecf-9800-4dd82827d9e3)
+![image](https://github.com/pulivilizator/ChessBot/assets/112427972/4a3f4146-45f9-43a7-8d72-efc5e8366bea)
 
 ### Используемые технологии:
 - Python 3.11;
