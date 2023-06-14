@@ -1,2 +1,2 @@
-from db import *
+from .db import *
 from .redis_storage import *
