@@ -2,7 +2,7 @@
 
 [![Discourse topics](https://img.shields.io/badge/telegram-%40pvp__chessbot-blue)](https://t.me/pvp_chessbot) [![Discourse topics](https://img.shields.io/badge/License-GPLv3-orange)](https://www.gnu.org/licenses/gpl-3.0) 
 
-### Бот позволяющий играть в шахматы с людьми, либо с шахматным движком по стандартным правилам при помощи инлайн клавиатуры.
+### [Бот](https://t.me/pvp_chessbot) позволяющий играть в шахматы с людьми, либо с шахматным движком по стандартным правилам при помощи инлайн клавиатуры.
 
 ![image](https://github.com/pulivilizator/ChessBot/assets/112427972/4a3f4146-45f9-43a7-8d72-efc5e8366bea)
 
